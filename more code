@@ -1,0 +1,34 @@
+let servo = null;
+
+// Function to control the servo based on ultrasonic sensor readings
+function controlServo() {
+    // Trigger the ultrasonic sensor to measure distance
+    pins.digitalWritePin(DigitalPin.P0, 0);
+    control.waitMicros(2);
+    pins.digitalWritePin(DigitalPin.P0, 1);
+    control.waitMicros(10);
+    pins.digitalWritePin(DigitalPin.P0, 0);
+    let distance = pins.pulseIn(DigitalPin.P1, PulseValue.High) / 58; // Convert pulse time to distance
+
+    // Control the servo based on the distance measured
+    if (servo) {
+        if (distance < 10) { // If an obstacle is too close (adjust this threshold as needed)
+            servo.writePin(0); // Turn right (adjust angle for your servo)
+        } else {
+            servo.writePin(180); // Turn left (adjust angle for your servo)
+        }
+    }
+}
+
+// Initialize servo and start automatic control when the Micro:bit starts
+input.onButtonPressed(Button.A, () => {
+    servo = pins.servoWritePin(AnalogPin.P2);
+    basic.showIcon(IconNames.Yes);
+    // Start controlling the servo based on ultrasonic sensor readings
+    controlServo();
+    // Set the interval to control the servo every 1 second (adjust as needed)
+    basic.forever(function () {
+        controlServo();
+        basic.pause(1000);
+    });
+});
