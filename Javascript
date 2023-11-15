@@ -1,0 +1,28 @@
+let servo = null;
+let isTurningLeft = true; // Flag to track direction
+
+basic.showIcon(IconNames.Happy);
+
+// Function to control the servo direction
+function controlServo() {
+    if (servo) {
+        if (isTurningLeft) {
+            servo.writePin(180); // Change the value for your servo's specific angle for left
+            basic.showArrow(ArrowNames.West);
+        } else {
+            servo.writePin(0); // Change the value for your servo's specific angle for right
+            basic.showArrow(ArrowNames.East);
+        }
+        isTurningLeft = !isTurningLeft; // Toggle direction
+    }
+}
+
+// Initialize servo when shaking the micro:bit
+input.onGesture(Gesture.Shake, () => {
+    servo = pins.servoWritePin(AnalogPin.P1);
+    basic.showIcon(IconNames.Yes);
+    // Start the interval after initialization
+    controlServo();
+    // Set the interval to turn the servo every 3 seconds (adjust as needed)
+    setInterval(controlServo, 3000);
+});
